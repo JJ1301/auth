@@ -1,16 +1,13 @@
 local Auth = {}
 
 local ValidUsers = {
-	["Player1"] = "secret123",
-	["DevUser"] = "admin2025",
-	["TestAcc"] = "pass456"
+    ["User"] = "123",
+    ["Sigma"] = "sigma",
+    ["Bust"] = "Nut"
 }
 
 function Auth:Check(username, password)
-	if ValidUsers[username] and ValidUsers[username] == password then
-		return true
-	end
-	return false
+    return ValidUsers[username] and ValidUsers[username] == password
 end
 
 return Auth

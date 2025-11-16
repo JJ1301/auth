@@ -1,4 +1,3 @@
--- MAIN ROBLOX AUTH SCRIPT (USERNAME FIELD = PASSWORD FIELD STYLE: PLACEHOLDER TEXT)
 local Auth = loadstring(game:HttpGet("https://raw.githubusercontent.com/JJ1301/auth/refs/heads/main/authentification.lua"))()
 
 local Players = game:GetService("Players")

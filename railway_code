@@ -1,0 +1,40 @@
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+
+const app = new Hono();
+app.use("/*", cors());
+
+const users: Record<string, string> = {
+  bust: "nut",
+  test: "test",
+  bbg: "baby",
+};
+
+app.post("/login", async (c) => {
+  const { username, password } = await c.req.json();
+
+  const isValid = await validateUser(username, password);
+
+  if (isValid) {
+    const sessionToken = await generateSessionToken(username);
+    return c.json({ sessionToken });
+  } else {
+    return c.json({ error: "Invalid username or password" }, 401);
+  }
+});
+
+async function validateUser(
+  username: string,
+  password: string
+): Promise<boolean> {
+  return users[username] === password;
+}
+
+async function generateSessionToken(username: string): Promise<string> {
+  return `session_token_for_${username}_${Date.now()}`;
+}
+
+Bun.serve({
+  port: Bun.env.PORT ?? 3000,
+  fetch: app.fetch,
+});

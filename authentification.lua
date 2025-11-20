@@ -1,4 +1,3 @@
---// FULL EXECUTOR LOGIN SCRIPT - BIG TEXT + PREMIUM LOOK (2025)
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")

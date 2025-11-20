@@ -1,5 +1,4 @@
---// URL: https://railway.com/project/60ac0025-ca55-4da8-ab82-2e2c3cd1beb8/service/e60e2175-71cd-4fa4-9013-985168240e90/source-code?environmentId=678987af-868a-4f16-b05c-565fec9ee81c
-
+--// FULL EXECUTOR LOGIN SCRIPT - BIG TEXT + PREMIUM LOOK (2025)
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -7,38 +6,32 @@ local TweenService = game:GetService("TweenService")
 -- YOUR BACKEND URL
 local LOGIN_URL = "https://function-bun-production-c7eb.up.railway.app/login"
 
+-- Force enable + executor HTTP
 if not HttpService.HttpEnabled then
     HttpService.HttpEnabled = true
 end
 
-local oldRequest = request or http_request or syn and syn.request
-if not oldRequest then
+local request = request or http_request or (syn and syn.request)
+if not request then
     error("Your executor doesn't support HTTP requests!")
 end
 
 local function ExecutorPost(url, body)
     local success, response = pcall(function()
-        return oldRequest({
+        return request({
             Url = url,
             Method = "POST",
-            Headers = {
-                ["Content-Type"] = "application/json"
-            },
+            Headers = { ["Content-Type"] = "application/json" },
             Body = body
         })
     end)
-    
-    if not success then
-        return false, "Request failed"
+    if not success or not response.Success then
+        return false, response.StatusMessage or "Request failed"
     end
-    
-    if response.Success then
-        return true, response.Body
-    else
-        return false, response.StatusMessage or "HTTP " .. response.StatusCode
-    end
+    return true, response.Body
 end
 
+--// GUI START
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
@@ -71,26 +64,47 @@ Title.Font = Enum.Font.GothamBold
 Title.TextSize = 28
 Title.Parent = LoginFrame
 
+--// Username Box - BIG TEXT + PADDING
 local UsernameBox = Instance.new("TextBox")
 UsernameBox.Size = UDim2.new(0, 300, 0, 45)
 UsernameBox.Position = UDim2.new(0.5, -150, 0, 60)
 UsernameBox.PlaceholderText = "Username"
-UsernameBox.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+UsernameBox.PlaceholderColor3 = Color3.fromRGB(170, 170, 170)
 UsernameBox.TextColor3 = Color3.new(1,1,1)
+UsernameBox.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 UsernameBox.Text = ""
+UsernameBox.Font = Enum.Font.Gotham
+UsernameBox.TextSize = 20
+UsernameBox.TextXAlignment = Enum.TextXAlignment.Left
+UsernameBox.ClearTextOnFocus = false
 UsernameBox.Parent = LoginFrame
-Instance.new("UICorner", UsernameBox).CornerRadius = UDim.new(0, 10)
 
+Instance.new("UICorner", UsernameBox).CornerRadius = UDim.new(0, 10)
+local UserPadding = Instance.new("UIPadding")
+UserPadding.PaddingLeft = UDim.new(0, 12)
+UserPadding.Parent = UsernameBox
+
+--// Password Box - BIG TEXT + PADDING
 local PasswordBox = Instance.new("TextBox")
 PasswordBox.Size = UDim2.new(0, 300, 0, 45)
 PasswordBox.Position = UDim2.new(0.5, -150, 0, 115)
 PasswordBox.PlaceholderText = "Password"
-PasswordBox.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+PasswordBox.PlaceholderColor3 = Color3.fromRGB(170, 170, 170)
 PasswordBox.TextColor3 = Color3.new(1,1,1)
+PasswordBox.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
 PasswordBox.Text = ""
+PasswordBox.Font = Enum.Font.Gotham
+PasswordBox.TextSize = 20
+PasswordBox.TextXAlignment = Enum.TextXAlignment.Left
+PasswordBox.ClearTextOnFocus = false
 PasswordBox.Parent = LoginFrame
-Instance.new("UICorner", PasswordBox).CornerRadius = UDim.new(0, 10)
 
+Instance.new("UICorner", PasswordBox).CornerRadius = UDim.new(0, 10)
+local PassPadding = Instance.new("UIPadding")
+PassPadding.PaddingLeft = UDim.new(0, 12)
+PassPadding.Parent = PasswordBox
+
+--// Login Button
 local LoginButton = Instance.new("TextButton")
 LoginButton.Size = UDim2.new(0, 300, 0, 45)
 LoginButton.Position = UDim2.new(0.5, -150, 0, 170)
@@ -102,6 +116,7 @@ LoginButton.TextSize = 22
 LoginButton.Parent = LoginFrame
 Instance.new("UICorner", LoginButton).CornerRadius = UDim.new(0, 10)
 
+--// Status Label
 local StatusLabel = Instance.new("TextLabel")
 StatusLabel.Size = UDim2.new(1, -40, 0, 30)
 StatusLabel.Position = UDim2.new(0, 20, 1, -45)
@@ -113,6 +128,7 @@ StatusLabel.TextSize = 20
 StatusLabel.TextXAlignment = Enum.TextXAlignment.Center
 StatusLabel.Parent = LoginFrame
 
+--// Main Frame (after login)
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 460, 0, 320)
 MainFrame.Position = UDim2.new(0.5, -230, 0.5, -160)
@@ -141,6 +157,7 @@ MainLabel.TextXAlignment = Enum.TextXAlignment.Center
 MainLabel.TextYAlignment = Enum.TextYAlignment.Center
 MainLabel.Parent = MainFrame
 
+--// Clear status
 local function clearStatus()
     task.wait(3)
     if StatusLabel.Text ~= "Successfully logged in!" then
@@ -148,6 +165,7 @@ local function clearStatus()
     end
 end
 
+--// Login Logic
 LoginButton.MouseButton1Click:Connect(function()
     local username = UsernameBox.Text
     local password = PasswordBox.Text
@@ -172,16 +190,20 @@ LoginButton.MouseButton1Click:Connect(function()
                 StatusLabel.Text = "Successfully logged in!"
                 StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
                 task.wait(1.5)
+
+                -- Fade out login frame
                 TweenService:Create(LoginFrame, TweenInfo.new(0.4), {BackgroundTransparency = 1}):Play()
                 TweenService:Create(UIStroke, TweenInfo.new(0.4), {Transparency = 1}):Play()
                 task.wait(0.5)
                 LoginFrame.Visible = false
+
+                -- Fade in main frame
                 MainFrame.Visible = true
                 MainFrame.BackgroundTransparency = 1
                 TweenService:Create(MainFrame, TweenInfo.new(0.6), {BackgroundTransparency = 0}):Play()
 
                 getgenv().MY_SESSION_TOKEN = data.sessionToken
-                --// print("Logged in! Token:", data.sessionToken)
+                print("Logged in! Token saved to getgenv().MY_SESSION_TOKEN")
             else
                 StatusLabel.Text = "Wrong username or password"
                 StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
